@@ -14,6 +14,9 @@ case "$INSTR" in
             echo "${VERSION}${PURE_SUFFIX}"
         fi
         ;;
+    get-version)
+        echo "${VERSION}${PURE_SUFFIX}"
+        ;;
     *)
         echo invalid arguments 1>&2
         exit 1

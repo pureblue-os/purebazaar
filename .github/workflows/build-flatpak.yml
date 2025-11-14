@@ -15,6 +15,8 @@ jobs:
   flatpak:
     name: "Flatpak"
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
       options: --privileged
@@ -22,8 +24,48 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
+        fetch-depth: 0
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: Bazaar.flatpak
         manifest-path: build-aux/flatpak/io.github.pureblue_os.purebazaar.json
         cache-key: flatpak-builder-${{ github.sha }}
+    - name: Get project version
+      id: get_version
+      run: |
+        # get clean version with suffix (e.g. 0.5.11.pure.20251114)
+        VERSION=$(./version.sh get-version)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Check for existing tag
+      id: tag_check
+      run: |
+        # ensure tags are fetched for existence check
+        git fetch --tags
+        if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create and push tag (if missing)
+      if: steps.tag_check.outputs.exists == 'false'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        VERSION="${{ steps.get_version.outputs.version }}"
+        git tag -a "v$VERSION" -m "Release v$VERSION"
+        git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" "v$VERSION"
+
+    - name: Create GitHub release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        release_name: Release v${{ steps.get_version.outputs.version }}
+        body: Automated release from CI
+        draft: false
+        prerelease: false
