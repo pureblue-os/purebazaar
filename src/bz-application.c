@@ -476,7 +476,7 @@ bz_application_about_action (GSimpleAction *action,
       "version", PACKAGE_VERSION,
       "copyright", "© 2025 Pureblue OS",
       "license-type", GTK_LICENSE_GPL_3_0,
-      "website", "https://github.com/kolunmi/bazaar",
+      "website", "https://github.com/pureblue-os/purebazaar",
       NULL);
 
   adw_dialog_present (dialog, GTK_WIDGET (window));
