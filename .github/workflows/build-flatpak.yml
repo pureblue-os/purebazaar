@@ -37,6 +37,9 @@ jobs:
         VERSION=$(./version.sh get-version)
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+    - name: Configure git safe directory
+      run: git config --global --add safe.directory /__w/purebazaar/purebazaar
+
     - name: Check for existing tag
       id: tag_check
       run: |
