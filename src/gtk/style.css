@@ -132,26 +132,12 @@
 	--accent-bg-color: @window_fg_color;
 }
 
-@media (prefers-color-scheme: dark) {
-  .flathub {
-    --accent-color: alpha(#fafafa,0.75);
-    --accent-bg-color: #7847b8;
-  }
-}
-
 global-progress {
   color: var(--accent-bg-color);
 }
 
 global-progress image {
   color: var(--window-fg-color);
-}
-
-@media (prefers-color-scheme: light) {
-  .flathub {
-    --accent-color: #251f32;
-    --accent-bg-color: #251f32;
-  }
 }
 
 .lozenge {
@@ -322,23 +308,6 @@ window,
 headerbar,
 .global-search {
   transition: background-color 0.2s ease;
-}
-
-.flathub {
-  --flathub-bg-hue: 301.44;
-}
-
-.flathub .global-search,
-window.flathub {
-  background-color: oklch(from var(--window-bg-color) l calc(c * 4) var(--flathub-bg-hue));
-}
-
-.flathub .toplevel-headerbar {
-  background-color: oklch(from var(--window-bg-color) l calc(c * 4) var(--flathub-bg-hue));
-}
-
-.flathub .sidebar-pane {
-  background-color: oklch(from var(--sidebar-bg-color) l calc(c * 4) var(--flathub-bg-hue));
 }
 
 .flathub-lotion {
