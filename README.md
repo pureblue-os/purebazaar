@@ -25,4 +25,5 @@ bazaar
 
 ---
 
-This repo is a minimal fork of [kolunmi/bazaar](https://github.com/kolunmi/bazaar)
+This repo is a minimal fork of [kolunmi/bazaar](https://github.com/kolunmi/bazaar), go support the original project
+
