@@ -1,5 +1,5 @@
 project('purestore', 'c',
-          version: run_command('version.sh', 'get-vcs').stdout().strip(),
+          version: run_command('version.sh').stdout().strip(),
     meson_version: '>= 1.0.0',
   default_options: [
     'warning_level=2',
