@@ -477,6 +477,13 @@ template $BzWindow: Adw.ApplicationWindow {
 menu primary_menu {
   section {
     item {
+      label: _("Install from File...");
+      action: "app.install-file";
+    }
+  }
+
+  section {
+    item {
       label: _("_Refresh Content");
       action: "app.refresh";
     }

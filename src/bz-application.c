@@ -379,6 +379,65 @@ bz_application_store_inspector_action (GSimpleAction *action,
 }
 
 static void
+install_flatpak_file_callback (GObject      *source,
+                               GAsyncResult *result,
+                               gpointer      user_data)
+{
+  GtkFileDialog *dialog = GTK_FILE_DIALOG (source);
+  BzApplication *self   = user_data;
+  g_autoptr (GFile) file = NULL;
+  g_autoptr (GError) error = NULL;
+
+  file = gtk_file_dialog_open_finish (dialog, result, &error);
+  
+  if (error != NULL)
+    {
+      if (!g_error_matches (error, GTK_DIALOG_ERROR, GTK_DIALOG_ERROR_DISMISSED))
+        g_warning ("Error opening file dialog: %s", error->message);
+      return;
+    }
+
+  if (file != NULL)
+    {
+      open_flatpakref_take (self, g_object_ref (file));
+    }
+}
+
+static void
+bz_application_install_file_action (GSimpleAction *action,
+                                   GVariant      *parameter,
+                                   gpointer       user_data)
+{
+  BzApplication    *self   = user_data;
+  GtkWindow        *window = NULL;
+  GtkFileDialog    *dialog = NULL;
+  g_autoptr (GtkFileFilter) filter = NULL;
+  g_autoptr (GListStore) filters = NULL;
+
+  g_assert (BZ_IS_APPLICATION (self));
+
+  window = gtk_application_get_active_window (GTK_APPLICATION (self));
+  
+  /* Create file filter for Flatpak files */
+  filter = gtk_file_filter_new ();
+  gtk_file_filter_set_name (filter, _ ("Flatpak Files"));
+  gtk_file_filter_add_pattern (filter, "*.flatpak");
+  gtk_file_filter_add_pattern (filter, "*.flatpakref");
+  
+  filters = g_list_store_new (GTK_TYPE_FILE_FILTER);
+  g_list_store_append (filters, filter);
+  
+  /* Create and configure file dialog */
+  dialog = gtk_file_dialog_new ();
+  gtk_file_dialog_set_title (dialog, _ ("Flatpak File"));
+  gtk_file_dialog_set_modal (dialog, TRUE);
+  gtk_file_dialog_set_filters (dialog, G_LIST_MODEL (filters));
+  
+  /* Open the dialog */
+  gtk_file_dialog_open (dialog, window, NULL, install_flatpak_file_callback, self);
+}
+
+static void
 bz_application_flatseal_action (GSimpleAction *action,
                                 GVariant      *parameter,
                                 gpointer       user_data)
@@ -513,6 +572,7 @@ static const GActionEntry app_actions[] = {
   {            "flatseal",            bz_application_flatseal_action, NULL },
   {     "store-inspector",    bz_application_store_inspector_action, NULL },
   {   "toggle-debug-mode",   bz_application_toggle_debug_mode_action, NULL },
+  {        "install-file",        bz_application_install_file_action, NULL },
 };
 
 static gpointer
